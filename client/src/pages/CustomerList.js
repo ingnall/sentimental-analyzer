@@ -1,8 +1,9 @@
 import { Helmet } from 'react-helmet';
-import { Box, Container } from '@material-ui/core';
-import CustomerListResults from 'src/components/customer/CustomerListResults';
-import CustomerListToolbar from 'src/components/customer/CustomerListToolbar';
-import customers from 'src/__mocks__/customers';
+import { Box, Container, Grid } from '@material-ui/core';
+import History from '../components/dashboard/History';
+// import customers from '../__mocks__/customers';
+// import CustomerListResults from '../components/customer/CustomerListResults';
+// import CustomerListToolbar from '../components/customer/CustomerListToolbar';
 
 const CustomerList = () => (
   <>
@@ -17,10 +18,24 @@ const CustomerList = () => (
       }}
     >
       <Container maxWidth={false}>
-        <CustomerListToolbar />
-        <Box sx={{ pt: 3 }}>
+        <Grid
+          container
+          spacing={4}
+        >
+          <Grid
+            item
+            xl={9}
+            lg={12}
+            md={12}
+            xs={12}
+          >
+            <History />
+          </Grid>
+        </Grid>
+        {/* <CustomerListToolbar /> */}
+        {/* <Box sx={{ pt: 3 }}>
           <CustomerListResults customers={customers} />
-        </Box>
+        </Box> */}
       </Container>
     </Box>
   </>

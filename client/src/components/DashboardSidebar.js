@@ -32,12 +32,12 @@ const items = [
     title: 'Dashboard'
   },
   {
-    href: '/app/products',
+    href: '/app/analyzer',
     icon: UsersIcon,
     title: 'Sentimental Analyzer'
   },
   {
-    href: '/app/customers',
+    href: '/app/history',
     icon: ShoppingBagIcon,
     title: 'History'
   },
@@ -49,13 +49,13 @@ const items = [
   {
     href: '/app/settings',
     icon: SettingsIcon,
-    title: 'Logout'
-  },
-  {
-    href: '/login',
-    icon: SettingsIcon,
-    title: 'Login'
+    title: 'Setting'
   }
+  // {
+  //   href: '/login',
+  //   icon: SettingsIcon,
+  //   title: 'Login'
+  // }
 ];
 
 const DashboardSidebar = ({ onMobileClose, openMobile }) => {

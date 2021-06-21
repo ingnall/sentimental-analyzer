@@ -13,15 +13,19 @@ import {
 const states = [
   {
     value: 'Punjab',
-    label: 'Alabama'
+    label: 'Punjab'
   },
   {
     value: 'Sindh',
-    label: 'New York'
+    label: 'Sindh'
   },
   {
     value: 'Balochistan',
-    label: 'San Francisco'
+    label: 'Balochistan'
+  },
+  {
+    value: 'KPK',
+    label: 'KPK'
   }
 ];
 

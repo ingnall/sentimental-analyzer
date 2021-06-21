@@ -9,19 +9,20 @@ import {
   colors,
   useTheme
 } from '@material-ui/core';
-import LaptopMacIcon from '@material-ui/icons/LaptopMac';
-import PhoneIcon from '@material-ui/icons/Phone';
-import TabletIcon from '@material-ui/icons/Tablet';
+import SentimentSatisfiedAlt from '@material-ui/icons/SentimentSatisfiedAlt';
+import SentimentNeutral from '@material-ui/icons/SentimentNeutral';
+import SentimentVeryDissatisfied from '@material-ui/icons/SentimentVeryDissatisfied';
 
 const TrafficByDevice = (props) => {
+  const { positive, neutral, negative } = { ...props };
   const theme = useTheme();
 
   const data = {
     datasets: [
       {
-        data: [63, 15, 22],
+        data: [(positive * 100).toFixed(1), (negative * 100).toFixed(1), (neutral * 100).toFixed(1)],
         backgroundColor: [
-          colors.indigo[500],
+          colors.green[600],
           colors.red[600],
           colors.orange[600]
         ],
@@ -55,35 +56,35 @@ const TrafficByDevice = (props) => {
     }
   };
 
-  const devices = [
+  const comment = [
     {
       title: 'Positive',
-      value: 63,
-      icon: LaptopMacIcon,
-      color: colors.indigo[500]
-    },
-    {
-      title: 'Negative',
-      value: 15,
-      icon: TabletIcon,
-      color: colors.red[600]
+      value: (positive * 100).toFixed(1),
+      icon: SentimentSatisfiedAlt,
+      color: colors.green[600]
     },
     {
       title: 'Neutral',
-      value: 23,
-      icon: PhoneIcon,
+      value: (neutral * 100).toFixed(1),
+      icon: SentimentNeutral,
       color: colors.orange[600]
+    },
+    {
+      title: 'Negative',
+      value: (negative * 100).toFixed(1),
+      icon: SentimentVeryDissatisfied,
+      color: colors.red[600]
     }
   ];
 
   return (
-    <Card {...props}>
+    <Card sx={{ height: '100%' }}>
       <CardHeader title="Graphical Representation" />
       <Divider />
       <CardContent>
         <Box
           sx={{
-            height: 300,
+            height: 250,
             position: 'relative'
           }}
         >
@@ -99,7 +100,7 @@ const TrafficByDevice = (props) => {
             pt: 2
           }}
         >
-          {devices.map(({
+          {comment.map(({
             color,
             icon: Icon,
             title,

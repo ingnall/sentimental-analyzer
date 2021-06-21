@@ -86,7 +86,7 @@ router.post("/login", (req, res) => {
 
         res.status(200).json({
           success: true,
-          accessToken: "Bearer " + token,
+          accessToken: token,
         });
       } else {
         return res
@@ -97,8 +97,8 @@ router.post("/login", (req, res) => {
   });
 });
 
-router.get("/", (req, res, next) => {
-  let token = req.headers["x-access-token"];
+router.get("/", (req, res) => {
+  let token = req.headers['x-access-token'];
 
   if (!token) {
     return res.status(403).send({ message: "No token provided!" });
@@ -107,20 +107,18 @@ router.get("/", (req, res, next) => {
   jwt.verify(token, keys.secretOrKey, (err, decoded) => {
     if (err) {
       return res.status(401).send({ message: "Unauthorized!" });
-    }
-    req.userId = decoded.id;
+    } else {
+      req.userId = decoded.id;
 
-    User.find({}, function (err, users) {
-      var userMap = {};
+      User.find({}, function (err, users) {
+        var userMap = {};
 
-      users.forEach(function (user) {
-        userMap[user._id] = user;
+        users.forEach(function (user) {
+          userMap[user._id] = user;
+        });
+        res.send(userMap);
       });
-
-      res.send(userMap);
-    });
-
-    next();
+    }
   });
 });
 
