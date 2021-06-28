@@ -2,7 +2,7 @@ import { Navigate } from 'react-router-dom';
 import DashboardLayout from './components/DashboardLayout';
 import MainLayout from './components/MainLayout';
 import Account from './pages/Account';
-import CustomerList from './pages/CustomerList';
+import PostUrls from './pages/PostUrls';
 import Dashboard from './pages/Dashboard';
 import Login from './pages/Login';
 import NotFound from './pages/NotFound';
@@ -16,7 +16,7 @@ const routes = [
     element: <DashboardLayout />,
     children: [
       { path: 'account', element: <Account /> },
-      { path: 'history', element: <CustomerList /> },
+      { path: 'history', element: <PostUrls /> },
       { path: 'dashboard', element: <Dashboard /> },
       { path: 'analyzer', element: <Analyzer /> },
       { path: 'settings', element: <Settings /> },

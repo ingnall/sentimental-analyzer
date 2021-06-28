@@ -24,14 +24,6 @@ module.exports = function validateRegisterInput(data) {
   } else if (!Validator.isEmail(data.email)) {
     errors.email = "Email is invalid";
   }
-  // else {
-  //   User.findOne({ email: data.email })
-  //     .then((user) => {
-  //       if (user)
-  //         errors.email = "Email already exists";
-  //     })
-  // }
-
   // Password checks
   if (Validator.isEmpty(data.password))
     errors.password = "Password field is required";

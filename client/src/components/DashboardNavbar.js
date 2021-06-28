@@ -41,7 +41,9 @@ const DashboardNavbar = ({ onMobileNavOpen, ...rest }) => {
           <IconButton
             color="inherit"
             onClick={() => {
+              localStorage.removeItem('userId');
               localStorage.removeItem('token');
+              localStorage.removeItem('loginWithFB');
               navigate('/login', { replace: true });
             }}
           >

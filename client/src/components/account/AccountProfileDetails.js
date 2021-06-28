@@ -1,4 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router';
+import axios from 'axios';
 import {
   Box,
   Button,
@@ -10,6 +12,7 @@ import {
   TextField
 } from '@material-ui/core';
 
+// eslint-disable-next-line no-unused-vars
 const states = [
   {
     value: 'Punjab',
@@ -30,19 +33,63 @@ const states = [
 ];
 
 const AccountProfileDetails = (props) => {
+  const navigate = useNavigate();
   const [values, setValues] = useState({
-    firstName: 'Faizan',
-    lastName: 'Khalid',
-    email: 'meharfaizan228@gmail.com',
-    phone: '+92314422171',
-    state: 'Punjab',
-    country: 'Pakistan'
+    firstName: ' ',
+    lastName: ' ',
+    email: ' ',
+    loginWithFB: false
   });
+
+  useEffect(() => {
+    axios.get('http://localhost:5000/api/user/find', {
+      headers: {
+        'Access-Control-Allow-Origin': true,
+        'x-access-token': localStorage.getItem('token')
+      },
+      params: {
+        userId: localStorage.getItem('userId'),
+        loginWithFB: localStorage.getItem('loginWithFB')
+      }
+    }).then((res) => {
+      console.log(res.data);
+      setValues({
+        firstName: res.data.firstName,
+        lastName: res.data.lastName,
+        email: res.data.email,
+        loginWithFB: localStorage.getItem('loginWithFB'),
+      });
+    }).catch((err) => {
+      if (err.response.status === 400 || err.response.status === 401 || err.response.status === 403) {
+        console.log(err.response.message);
+        navigate('/login', { replace: true });
+      }
+    });
+  }, []);
 
   const handleChange = (event) => {
     setValues({
       ...values,
       [event.target.name]: event.target.value
+    });
+  };
+
+  const updateUserDetail = () => {
+    axios.post('http://localhost:5000/api/user/update', {
+      userId: localStorage.getItem('userId'),
+      firstName: values.firstName,
+      lastName: values.lastName,
+      email: values.email,
+      loginWithFB: localStorage.getItem('loginWithFB'),
+    }, {
+      headers: {
+        'Access-Control-Allow-Origin': true,
+        'x-access-token': localStorage.getItem('token')
+      }
+    }).then((res) => {
+      console.log(res.data);
+    }).catch((err) => {
+      console.log(err);
     });
   };
 
@@ -109,7 +156,7 @@ const AccountProfileDetails = (props) => {
                 variant="outlined"
               />
             </Grid>
-            <Grid
+            {/* <Grid
               item
               md={6}
               xs={12}
@@ -165,6 +212,7 @@ const AccountProfileDetails = (props) => {
                 ))}
               </TextField>
             </Grid>
+           */}
           </Grid>
         </CardContent>
         <Divider />
@@ -178,6 +226,7 @@ const AccountProfileDetails = (props) => {
           <Button
             color="primary"
             variant="contained"
+            onClick={updateUserDetail}
           >
             Save details
           </Button>

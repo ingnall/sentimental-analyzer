@@ -1,4 +1,6 @@
+/* eslint-disable no-alert */
 import { useState } from 'react';
+import axios from 'axios';
 import {
   Box,
   Button,
@@ -20,6 +22,30 @@ const SettingsPassword = (props) => {
       ...values,
       [event.target.name]: event.target.value
     });
+  };
+
+  const updatePassword = () => {
+    if (values.password === values.confirm === '') {
+      alert('Please fields are required!');
+    } else if (values.password !== values.confirm) {
+      alert('Password and Confirm password are not same!');
+    } else if (values.password.length < 8) {
+      alert('Password must be at least 8 characters.');
+    } else {
+      axios.post('http://localhost:5000/api/user/setting', {
+        userId: localStorage.getItem('userId'),
+        password: values.password,
+        password2: values.confirm,
+        loginWithFB: localStorage.getItem('loginWithFB')
+      }, {
+        headers: {
+          'Access-Control-Allow-Origin': true,
+          'x-access-token': localStorage.getItem('token')
+        }
+      })
+        .then((res) => console.log('success: ', res.data))
+        .catch((err) => console.log(err));
+    }
   };
 
   return (
@@ -63,6 +89,7 @@ const SettingsPassword = (props) => {
           <Button
             color="primary"
             variant="contained"
+            onClick={updatePassword}
           >
             Update
           </Button>

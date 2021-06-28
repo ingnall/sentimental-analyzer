@@ -1,14 +1,15 @@
 import { useEffect } from 'react';
-import { Link as RouterLink, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
+// import { Link as RouterLink, useLocation } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import {
-  Avatar,
+  // Avatar,
   Box,
-  Divider,
+  // Divider,
   Drawer,
   Hidden,
   List,
-  Typography
+  // Typography
 } from '@material-ui/core';
 import {
   BarChart as BarChartIcon,
@@ -19,11 +20,11 @@ import {
 } from 'react-feather';
 import NavItem from './NavItem';
 
-const user = {
-  avatar: '/static/images/avatars/avatar_6.png',
-  jobTitle: 'Student',
-  name: 'Faizan Khalid'
-};
+// const user = {
+//   avatar: '/static/images/avatars/avatar_6.png',
+//   jobTitle: 'Student',
+//   name: 'Faizan Khalid'
+// };
 
 const items = [
   {
@@ -75,7 +76,7 @@ const DashboardSidebar = ({ onMobileClose, openMobile }) => {
         height: '100%'
       }}
     >
-      <Box
+      {/* <Box
         sx={{
           alignItems: 'center',
           display: 'flex',
@@ -106,7 +107,7 @@ const DashboardSidebar = ({ onMobileClose, openMobile }) => {
           {user.jobTitle}
         </Typography>
       </Box>
-      <Divider />
+      <Divider /> */}
       <Box sx={{ p: 2 }}>
         <List>
           {items.map((item) => (

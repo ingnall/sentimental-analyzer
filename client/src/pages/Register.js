@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import axios from 'axios';
@@ -6,9 +7,9 @@ import { Formik } from 'formik';
 import {
   Box,
   Button,
-  Checkbox,
+  // Checkbox,
   Container,
-  FormHelperText,
+  // FormHelperText,
   Link,
   TextField,
   Typography
@@ -16,6 +17,22 @@ import {
 
 const Register = () => {
   const navigate = useNavigate();
+
+  useEffect(() => {
+    axios.get('http://localhost:5000/api/user/find', {
+      headers: {
+        'Access-Control-Allow-Origin': true,
+        'x-access-token': localStorage.getItem('token')
+      },
+      params: {
+        userId: localStorage.getItem('userId'),
+        loginWithFB: localStorage.getItem('loginWithFB')
+      }
+    }).then((res) => {
+      console.log(res.data);
+      navigate('/app/dashboard', { replace: true });
+    }).catch((err) => { console.log(err); console.log('User not logged in'); });
+  }, []);
 
   return (
     <>
@@ -38,8 +55,7 @@ const Register = () => {
               lastName: '',
               email: '',
               password: '',
-              password2: '',
-              policy: false
+              password2: ''
             }}
             validationSchema={Yup.object().shape({
               email: Yup.string()
@@ -57,11 +73,11 @@ const Register = () => {
                 .required('password is required'),
               password2: Yup.string()
                 .max(255)
-                .required('password is required'),
-              policy: Yup.boolean().oneOf(
-                [true],
-                'This field must be checked'
-              )
+                .required('password is required')
+              // policy: Yup.boolean().oneOf(
+              //   [true],
+              //   'This field must be checked'
+              // )
             })}
             onSubmit={(e) => {
               console.log(e);
@@ -79,6 +95,8 @@ const Register = () => {
                 })
                 .then((res) => {
                   console.log(res.data);
+                  // eslint-disable-next-line no-alert
+                  alert('Account created.');
                   navigate('/login', { replace: true });
                 })
                 .catch((err) => {
@@ -172,7 +190,7 @@ const Register = () => {
                   value={values.password2}
                   variant="outlined"
                 />
-                <Box
+                {/* <Box
                   sx={{
                     alignItems: 'center',
                     display: 'flex',
@@ -200,7 +218,7 @@ const Register = () => {
                 </Box>
                 {Boolean(touched.policy && errors.policy) && (
                   <FormHelperText error>{errors.policy}</FormHelperText>
-                )}
+                )} */}
                 <Box sx={{ py: 2 }}>
                   <Button
                     color="primary"

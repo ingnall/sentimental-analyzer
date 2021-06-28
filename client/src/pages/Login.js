@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import axios from 'axios';
@@ -8,17 +8,63 @@ import {
   Box,
   Button,
   Container,
-  // Grid,
+  Grid,
   Link,
   TextField,
   Typography
 } from '@material-ui/core';
-// import FacebookIcon from '../icons/Facebook';
-// import GoogleIcon from '../icons/Google';
+import FacebookLogin from 'react-facebook-login';
+import FacebookIcon from '../icons/Facebook';
 
 const Login = () => {
   const navigate = useNavigate();
   const [wrong, setWrong] = useState(false);
+
+  useEffect(() => {
+    axios.get('http://localhost:5000/api/user/find', {
+      headers: {
+        'Access-Control-Allow-Origin': true,
+        'x-access-token': localStorage.getItem('token')
+      },
+      params: {
+        userId: localStorage.getItem('userId'),
+        loginWithFB: localStorage.getItem('loginWithFB')
+      }
+    }).then((res) => {
+      console.log(res.data);
+      navigate('/app/dashboard', { replace: true });
+    }).catch((err) => { console.log(err); console.log('User not logged in'); });
+  }, []);
+
+  const componentClicked = () => { };
+
+  const responseFacebook = (fbRes) => {
+    console.log(fbRes);
+    // eslint-disable-next-line no-undef
+    FB.getLoginStatus((response) => {
+      if (response.status === 'connected') {
+        console.log(response);
+
+        axios.post('http://localhost:5000/api/users/facebook-login', {
+          firstName: fbRes.name.split(' ')[0],
+          lastName: fbRes.name.split(' ')[1],
+          email: fbRes.email,
+        }, {
+          headers: {
+            'Access-Control-Allow-Origin': true,
+          }
+        })
+          .then((res) => {
+            console.log(res.data);
+            localStorage.setItem('userId', res.data.userId);
+            localStorage.setItem('loginWithFB', true);
+            localStorage.setItem('token', fbRes.accessToken);
+            navigate('/app/dashboard', { replace: true });
+          })
+          .catch((err) => { console.log(err); });
+      }
+    });
+  };
 
   return (
     <>
@@ -55,6 +101,8 @@ const Login = () => {
               })
                 .then((res) => {
                   console.log(res.data);
+                  localStorage.setItem('userId', res.data.userId);
+                  localStorage.setItem('loginWithFB', false);
                   localStorage.setItem('token', res.data.accessToken);
                   navigate('/app/dashboard', { replace: true });
                 })
@@ -91,43 +139,27 @@ const Login = () => {
                     Sign in on the internal platform
                   </Typography>
                 </Box>
-                {/* <Grid
+                <Grid
                   container
-                  spacing={3}
+                  spacing={2}
                 >
+                  <Grid item xs={3} />
                   <Grid
                     item
-                    xs={12}
-                    md={6}
+                    xs={6}
+                    justify="center"
                   >
-                    <Button
-                      color="primary"
-                      fullWidth
-                      startIcon={<FacebookIcon />}
-                      onClick={handleSubmit}
-                      size="large"
-                      variant="contained"
-                    >
-                      Login with Facebook
-                    </Button>
+                    <FacebookLogin
+                      appId="1146881102489398"
+                      fields="name,email,picture"
+                      icon={<FacebookIcon style={{ marginBottom: '-6px', width: '25px' }} />}
+                      size="small"
+                      onClick={componentClicked}
+                      callback={responseFacebook}
+                    />
                   </Grid>
-                  <Grid
-                    item
-                    xs={12}
-                    md={6}
-                  >
-                    <Button
-                      fullWidth
-                      startIcon={<GoogleIcon />}
-                      onClick={handleSubmit}
-                      size="large"
-                      variant="contained"
-                    >
-                      Login with Google
-                    </Button>
-                  </Grid>
-                </Grid> */}
-                {/* <Box
+                </Grid>
+                <Box
                   sx={{
                     pb: 1,
                     pt: 3
@@ -138,9 +170,9 @@ const Login = () => {
                     color="textSecondary"
                     variant="body1"
                   >
-                    or login with email address
+                    or signin with email address
                   </Typography>
-                </Box> */}
+                </Box>
                 <TextField
                   error={Boolean(touched.email && errors.email)}
                   fullWidth

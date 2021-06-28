@@ -13,12 +13,11 @@ import './dashboard.css';
 const Dashboard = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
-  const [positive, setPositive] = useState(0);
-  const [neutral, setNeutral] = useState(0);
-  const [negative, setNegative] = useState(0);
+  const [positive, setPositive] = useState(0.333);
+  const [neutral, setNeutral] = useState(0.333);
+  const [negative, setNegative] = useState(0.333);
   // eslint-disable-next-line no-unused-vars
   const [compound, setCompound] = useState(0);
-  // const [comments, setComments] = useState([]);
 
   useEffect(() => {
     setLoading(true);
@@ -27,11 +26,12 @@ const Dashboard = () => {
       headers: {
         'Access-Control-Allow-Origin': true,
         'x-access-token': localStorage.getItem('token')
+      },
+      params: {
+        loginWithFB: localStorage.getItem('loginWithFB')
       }
     })
       .then((res) => {
-        console.log(res.data);
-        // setComments(res.data.comments);
         const totalComments = res.data.comments.length;
         let sumPositive = 0;
         let sumNeutral = 0;
@@ -65,10 +65,14 @@ const Dashboard = () => {
   }, []);
 
   const getSentiments = (url) => {
-    axios.get(`http://localhost:5000/api/posts/find/?id=${url}`, {
+    axios.get('http://localhost:5000/api/posts/find', {
       headers: {
         'Access-Control-Allow-Origin': true,
         'x-access-token': localStorage.getItem('token')
+      },
+      params: {
+        id: url,
+        loginWithFB: localStorage.getItem('loginWithFB')
       }
     })
       .then((res) => {
@@ -134,7 +138,7 @@ const Dashboard = () => {
               Please wait
             </div>
             <div style={{ marginTop: '5px' }}>
-              <svg className="svg-containerr" height="160" width="160" viewBox="-2 -2 110 110">
+              <svg className="svg-containerr" height="160" width="160" viewBox="-2 -2 105 105">
                 <circle className="loader-svg bg" cx="50" cy="50" r="45" />
                 <circle className="loader-svg animate" cx="50" cy="50" r="45" />
               </svg>

@@ -5,7 +5,7 @@ import History from '../components/dashboard/History';
 // import CustomerListResults from '../components/customer/CustomerListResults';
 // import CustomerListToolbar from '../components/customer/CustomerListToolbar';
 
-const CustomerList = () => (
+const PostUrls = () => (
   <>
     <Helmet>
       <title>Customers | Material Kit</title>
@@ -32,13 +32,9 @@ const CustomerList = () => (
             <History />
           </Grid>
         </Grid>
-        {/* <CustomerListToolbar /> */}
-        {/* <Box sx={{ pt: 3 }}>
-          <CustomerListResults customers={customers} />
-        </Box> */}
       </Container>
     </Box>
   </>
 );
 
-export default CustomerList;
+export default PostUrls;

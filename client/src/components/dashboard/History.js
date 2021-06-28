@@ -7,7 +7,7 @@ import { v4 as uuid } from 'uuid';
 import PerfectScrollbar from 'react-perfect-scrollbar';
 import {
   Box,
-  // Button,
+  Button,
   Card,
   // CardHeader,
   CardContent,
@@ -89,127 +89,101 @@ const orders = [
 ];
 
 const History = (props) => {
-  const properties = { ...props };
+  const { isDashboard, getSentiments } = { ...props };
   const navigate = useNavigate();
   const [posts, setPosts] = useState([]);
 
   useEffect(() => {
-    axios.get('http://localhost:5000/api/posts', {
+    axios.get(`http://localhost:5000/api/posts?loginWithFB=${localStorage.getItem('loginWithFB')}`, {
       headers: {
         'Access-Control-Allow-Origin': true,
         'x-access-token': localStorage.getItem('token')
       }
     })
       .then((res) => {
-        console.log(res.data);
         setPosts(Object.values(res.data));
       })
       .catch((err) => {
-        if (err.response.status === 401 || err.response.status === 403) {
-          console.log(err.response.message);
-          navigate('/login', { replace: true });
-        } if (err.response.status === 404) {
-          console.log(err.response.message);
+        if (err.response) {
+          if (err.response.status === 401 || err.response.status === 403) {
+            console.log(err.response.message);
+            navigate('/login', { replace: true });
+          } if (err.response.status === 404) {
+            console.log(err.response.message);
+          }
         } else {
           console.log(err);
         }
       });
   }, []);
 
+  const reviewPostComments = (postId) => {
+    navigator.clipboard.writeText((postId).toString());
+    navigate('/app/analyzer', { replace: true });
+  };
+
   return (
-    <Card {...props}>
-      {/* <CardHeader
-      title="History"
-      style={{
-        color: '#5664d2',
-        fontSize: '24px'
-      }}
-    /> */}
+    <Card>
       <CardContent>
         <Typography color="primary" variant="h3">Post URLs</Typography>
       </CardContent>
       <Divider />
       <PerfectScrollbar>
-        <Box sx={{ minWidth: 800 }}>
+        <Box sx={{ minWidth: 680 }}>
           <Table>
-            {/* <TableHead>
-              <TableRow>
-                <TableCell>
-                  Post URLs
-                </TableCell>
-                <TableCell>
-                User Name
-              </TableCell>
-              <TableCell sortDirection="asc">
-                <Tooltip
-                  enterDelay={300}
-                  title="Sort"
-                >
-                  <TableSortLabel
-                    active
-                    direction="asc"
-                  >
-                    Date
-                  </TableSortLabel>
-                </Tooltip>
-              </TableCell>
-              <TableCell>
-                Status
-              </TableCell>
-              </TableRow>
-            </TableHead> */}
             <TableBody>
               {posts.length ? posts.map((post) => (
                 <TableRow
                   hover
                   key={post.id}
                 >
-                  <TableCell style={{ cursor: 'pointer' }}>
-                    <div
-                      role="button"
-                      tabIndex={post.id}
-                      style={{ cursor: 'pointer' }}
-                      onClick={() => { if (properties.isDashboard) properties.getSentiments(post.id); }}
-                      onKeyDown={(e) => { if (e.key === 'Enter' && properties.isDashboard) properties.getSentiments(post.id); }}
-                    >
-                      {post.id}
-                    </div>
+                  <TableCell>
+                    {post.id}
                   </TableCell>
-                  {/* <TableCell>
-                  {order.customer.name}
-                </TableCell>
-                <TableCell>
-                  {moment(order.createdAt).format('DD/MM/YYYY')}
-                </TableCell>
-                <TableCell>
-                  <Chip
-                    color="primary"
-                    label={order.status}
-                    size="small"
-                  />
-                </TableCell> */}
+                  {isDashboard
+                    ? (
+                      <TableCell>
+                        <Box>
+                          <Button
+                            variant="contained"
+                            style={{
+                              width: '100%',
+                              fontSize: '12px',
+                              fontFamily: 'Roboto'
+                            }}
+                            onClick={() => { if (isDashboard) getSentiments(post.id); }}
+                          >
+                            Average
+                          </Button>
+                        </Box>
+                      </TableCell>
+                    ) : <TableCell />}
+                  <TableCell>
+                    <Box>
+                      <Button
+                        variant="contained"
+                        style={{
+                          width: '100%',
+                          fontSize: '12px',
+                          fontFamily: 'Roboto'
+                        }}
+                        onClick={() => reviewPostComments(post.id)}
+                      >
+                        Reanalyze
+                      </Button>
+                    </Box>
+                  </TableCell>
                 </TableRow>
-              )) : ''}
+              ))
+                : (
+                  <TableRow>
+                    <TableCell>No facebook post is analyzed yet.</TableCell>
+                  </TableRow>
+                )}
             </TableBody>
           </Table>
         </Box>
       </PerfectScrollbar>
-      {/* <Box
-      sx={{
-        display: 'flex',
-        justifyContent: 'flex-end',
-        p: 2
-      }}
-    >
-      <Button
-        color="primary"
-        endIcon={<ArrowRightIcon />}
-        size="small"
-        variant="text"
-      >
-        View all
-      </Button>
-    </Box> */}
     </Card>
   );
 };
