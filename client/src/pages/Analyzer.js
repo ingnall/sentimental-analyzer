@@ -3,7 +3,6 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
-import PerfectScrollbar from 'react-perfect-scrollbar';
 import {
   makeStyles,
   Box,
@@ -14,41 +13,38 @@ import {
   CardContent,
   TextField,
   Button,
+  Radio,
+  RadioGroup,
+  FormControlLabel,
   IconButton,
   Typography,
-  // Divider,
   Paper,
   TableContainer,
   Table,
   TableHead,
   TableBody,
   TableRow,
-  TableCell,
-  // TableFooter,
-  // Pagination
+  TableCell
 } from '@material-ui/core';
 import { KeyboardArrowUp, KeyboardArrowDown } from '@material-ui/icons';
-// import ProductListToolbar from '../components/product/ProductListToolbar';
 import Negative from '../components/dashboard/Negative';
 import Positive from '../components/dashboard/Positive';
 import Neutral from '../components/dashboard/Neutral';
 import TrafficByDevice from '../components/dashboard/TrafficByDevice';
 import './analyzer.css';
-// import ProductCard from '../components/product/ProductCard';
-// import products from '../__mocks__/products';
 
 const Analyzer = () => {
   const navigate = useNavigate();
-  const [error, setError] = useState(false);
+  const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [analyze, setAnalyze] = useState(false);
   const [postUrl, setPostUrl] = useState('');
+  const [notFbPage, setNotFbPage] = useState(false);
   const [positive, setPositive] = useState(0.333);
   const [neutral, setNeutral] = useState(0.333);
   const [negative, setNegative] = useState(0.333);
-  // eslint-disable-next-line no-unused-vars
-  const [compound, setCompound] = useState(0.333);
   const [comments, setComments] = useState([]);
+  const [radioValue, setRadioValue] = useState('database');
 
   const useRowStyles = makeStyles({
     root: {
@@ -67,114 +63,184 @@ const Analyzer = () => {
     },
   });
 
-  const handleAnalyze = () => {
-    if (postUrl) {
-      setError(false);
+  const handleAnalyze = (URL) => {
+    if (URL) {
+      setError('');
       setLoading(true);
       setAnalyze(true);
 
-      axios.get('http://localhost:5000/api/posts/find', {
-        headers: {
-          'Access-Control-Allow-Origin': true,
-          'x-access-token': localStorage.getItem('token')
-        },
-        params: {
-          id: postUrl,
-          loginWithFB: localStorage.getItem('loginWithFB')
-        }
-      })
-        .then((findPostResponse) => {
-          console.log(findPostResponse.data);
-          setComments(findPostResponse.data.comments);
-
-          const totalComments = findPostResponse.data.comments.length;
-          let sumPositive = 0;
-          let sumNeutral = 0;
-          let sumNegative = 0;
-          let sumCompound = 0;
-          for (let i = 0; i < findPostResponse.data.comments.length; i++) {
-            sumPositive += findPostResponse.data.comments[i].object.pos;
-            sumNeutral += findPostResponse.data.comments[i].object.neu;
-            sumNegative += findPostResponse.data.comments[i].object.neg;
-            sumCompound += findPostResponse.data.comments[i].object.compound;
+      if (radioValue === 'database') {
+        axios.get('http://localhost:5000/api/posts/find', {
+          headers: {
+            'Access-Control-Allow-Origin': true,
+            'x-access-token': localStorage.getItem('token')
+          },
+          params: {
+            id: URL,
+            userId: localStorage.getItem('userId'),
+            loginWithFB: localStorage.getItem('loginWithFB')
           }
-          setPositive(sumPositive / totalComments);
-          setNeutral(sumNeutral / totalComments);
-          setNegative(sumNegative / totalComments);
-          setCompound(sumCompound / totalComments);
-          setLoading(false);
         })
-        .catch((findPostError) => {
-          if (findPostError.response.status === 401 || findPostError.response.status === 403) {
-            console.log(findPostError.response.message);
+          .then((findPostResponse) => {
+            setComments(findPostResponse.data.comments);
+
+            const totalComments = findPostResponse.data.comments.length;
+            let sumPositive = 0;
+            let sumNeutral = 0;
+            let sumNegative = 0;
+            for (let i = 0; i < findPostResponse.data.comments.length; i++) {
+              sumPositive += findPostResponse.data.comments[i].object.pos;
+              sumNeutral += findPostResponse.data.comments[i].object.neu;
+              sumNegative += findPostResponse.data.comments[i].object.neg;
+            }
+            setPositive(sumPositive / totalComments);
+            setNeutral(sumNeutral / totalComments);
+            setNegative(sumNegative / totalComments);
             setLoading(false);
-            navigate('/login', { replace: true });
-          } if (findPostError.response.status === 404) {
-            console.log(findPostError.response.message);
+          })
+          .catch((findPostError) => {
+            if (findPostError.response.status === 401 || findPostError.response.status === 403) {
+              console.log(findPostError.response.data.message);
+              setLoading(false);
+              navigate('/login', { replace: true });
+            } if (findPostError.response.status === 404) {
+              console.log(findPostError.response.data.message);
 
-            axios.post(`http://localhost:8000/?data=${postUrl}`)
-              .then((djangoRes) => {
-                console.log(djangoRes);
-                const objects = Object.values(djangoRes.data);
-                const array = Object.keys(djangoRes.data).map((key, index) => (
-                  { name: key, object: objects[index] }
-                ));
-                console.log(array);
-                if (!array.length) {
-                  setError(true);
-                  setLoading(false);
-                } else {
-                  setComments(array);
+              axios.post(`http://localhost:8000/?data=${URL}`)
+                .then((djangoRes) => {
+                  console.log(djangoRes);
+                  const objects = Object.values(djangoRes.data);
+                  const array = Object.keys(djangoRes.data).map((key, index) => (
+                    { name: key, object: objects[index] }
+                  ));
+                  console.log(array);
+                  if (!array.length) {
+                    setError('URL is not correct OR post does not have any comment');
+                    setLoading(false);
+                  } else {
+                    setComments(array);
 
-                  const totalComments = array.length;
-                  let sumPositive = 0;
-                  let sumNeutral = 0;
-                  let sumNegative = 0;
-                  let sumCompound = 0;
-                  for (let i = 0; i < array.length; i++) {
-                    sumPositive += array[i].object.pos;
-                    sumNeutral += array[i].object.neu;
-                    sumNegative += array[i].object.neg;
-                    sumCompound += array[i].object.compound;
-                  }
-                  setPositive(sumPositive / totalComments);
-                  setNeutral(sumNeutral / totalComments);
-                  setNegative(sumNegative / totalComments);
-                  setCompound(sumCompound / totalComments);
-                  setLoading(false);
-
-                  // Save result in MongoDB
-                  axios.post('http://localhost:5000/api/posts/save', {
-                    id: postUrl,
-                    comments: array,
-                    loginWithFB: localStorage.getItem('loginWithFB')
-                  }, {
-                    headers: {
-                      'Access-Control-Allow-Origin': true,
-                      'x-access-token': localStorage.getItem('token'),
+                    const totalComments = array.length;
+                    let sumPositive = 0;
+                    let sumNeutral = 0;
+                    let sumNegative = 0;
+                    for (let i = 0; i < array.length; i++) {
+                      sumPositive += array[i].object.pos;
+                      sumNeutral += array[i].object.neu;
+                      sumNegative += array[i].object.neg;
                     }
-                  })
-                    .then((nodeRes) => {
-                      console.log(nodeRes.data);
-                    })
-                    .catch((err) => {
-                      console.log(err.response);
-                      if (err.response.status === 400) {
-                        console.log(err.response.message);
-                      } if (err.response.status === 401 || err.response.status === 403) {
-                        console.log(err.response.message);
-                        navigate('/login', { replace: true });
+                    setPositive(sumPositive / totalComments);
+                    setNeutral(sumNeutral / totalComments);
+                    setNegative(sumNegative / totalComments);
+                    setLoading(false);
+
+                    // Save result in MongoDB
+                    axios.post('http://localhost:5000/api/posts/save', {
+                      id: URL,
+                      userId: localStorage.getItem('userId'),
+                      comments: array,
+                      loginWithFB: localStorage.getItem('loginWithFB')
+                    }, {
+                      headers: {
+                        'Access-Control-Allow-Origin': true,
+                        'x-access-token': localStorage.getItem('token'),
                       }
-                    });
+                    })
+                      .then((nodeRes) => {
+                        console.log(nodeRes.data);
+                      })
+                      .catch((err) => {
+                        console.log(err.response);
+                        if (err.response.status === 400) {
+                          console.log(err.response.data.message);
+                        } if (err.response.status === 401 || err.response.status === 403) {
+                          console.log(err.response.data.message);
+                          navigate('/login', { replace: true });
+                        }
+                      });
+                  }
+                })
+                .catch((err) => {
+                  console.log(err);
+                  setError('Server error');
+                  setLoading(false);
+                  setAnalyze(false);
+                });
+            }
+          });
+      } else if (radioValue === 'reanalyze') {
+        axios.post(`http://localhost:8000/?data=${postUrl}`)
+          .then((djangoRes) => {
+            const objects = Object.values(djangoRes.data);
+            const array = Object.keys(djangoRes.data).map((key, index) => (
+              { name: key, object: objects[index] }
+            ));
+            if (!array.length) {
+              setError('URL is not correct OR post does not have any comment');
+              setLoading(false);
+            } else {
+              setComments(array);
+
+              const totalComments = array.length;
+              let sumPositive = 0;
+              let sumNeutral = 0;
+              let sumNegative = 0;
+              for (let i = 0; i < array.length; i++) {
+                sumPositive += array[i].object.pos;
+                sumNeutral += array[i].object.neu;
+                sumNegative += array[i].object.neg;
+              }
+              setPositive(sumPositive / totalComments);
+              setNeutral(sumNeutral / totalComments);
+              setNegative(sumNegative / totalComments);
+              setLoading(false);
+
+              // Save result in MongoDB
+              axios.post('http://localhost:5000/api/posts/save', {
+                id: postUrl,
+                userId: localStorage.getItem('userId'),
+                comments: array,
+                loginWithFB: localStorage.getItem('loginWithFB')
+              }, {
+                headers: {
+                  'Access-Control-Allow-Origin': true,
+                  'x-access-token': localStorage.getItem('token'),
                 }
               })
-              .catch((err) => {
-                console.log(err.response);
-                setLoading(false);
-                setAnalyze(false);
-              });
-          }
-        });
+                .then((nodeRes) => {
+                  console.log(nodeRes.data);
+                })
+                .catch((err) => {
+                  if (err.response.status === 400) {
+                    console.log(err.response.data.message);
+                  } if (err.response.status === 401 || err.response.status === 403) {
+                    console.log(err.response.data.message);
+                    navigate('/login', { replace: true });
+                  }
+                });
+            }
+          })
+          .catch((err) => {
+            console.log(err);
+            setError('Server error');
+            setLoading(false);
+            setAnalyze(false);
+          });
+      }
+    }
+  };
+
+  const checkURL = () => {
+    let URL = postUrl;
+    if (URL.includes('https://m.facebook.com/')) {
+      setPostUrl(URL);
+      handleAnalyze(URL);
+    } else if (URL.includes('https://www.facebook.com/')) {
+      URL = URL.replace('www.', 'm.');
+      setPostUrl(URL);
+      handleAnalyze(URL);
+    } else {
+      setNotFbPage(true);
     }
   };
 
@@ -188,8 +254,7 @@ const Analyzer = () => {
         userId: localStorage.getItem('userId'),
         loginWithFB: localStorage.getItem('loginWithFB')
       }
-    }).then((res) => {
-      console.log(res.data);
+    }).then(() => {
       navigator.clipboard.readText().then((text) => {
         if (text.includes('https://m.facebook.com/')) {
           setPostUrl(text);
@@ -201,7 +266,7 @@ const Analyzer = () => {
       });
     }).catch((err) => {
       if (err.response.status === 400 || err.response.status === 401 || err.response.status === 403) {
-        console.log(err.response.message);
+        console.log(err.response.data.message);
         navigate('/login', { replace: true });
       }
     });
@@ -213,10 +278,9 @@ const Analyzer = () => {
       positivePercentage,
       neutralPercentage,
       negativePercentage,
-      cmpd,
+      compound,
       comment
     } = { ...props };
-    // console.log(props);
     const [open, setOpen] = useState(false);
     const classes = useRowStyles();
 
@@ -232,18 +296,24 @@ const Analyzer = () => {
               {open ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
             </IconButton>
           </TableCell>
-          <TableCell component="th" scope="row">
+          <TableCell
+            component="th"
+            scope="row"
+            style={{
+              color: compound >= 0.05 ? '#43a047' : compound <= -0.05 ? '#e53935' : '#fb8c00'
+            }}
+          >
             {name}
           </TableCell>
-          <TableCell style={{ color: '#43a047' }}>
+          <TableCell>
             {positivePercentage}
             %
           </TableCell>
-          <TableCell style={{ color: '#fb8c00' }}>
+          <TableCell>
             {neutralPercentage}
             %
           </TableCell>
-          <TableCell style={{ color: '#e53935' }}>
+          <TableCell>
             {negativePercentage}
             %
           </TableCell>
@@ -252,22 +322,17 @@ const Analyzer = () => {
           <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
             <Collapse in={open} timeout="auto" unmountOnExit>
               <Box margin={1}>
-                <Typography variant="h6" gutterBottom component="div">
+                <Typography
+                  variant="h6"
+                  gutterBottom
+                  component="div"
+                >
                   Comment
                 </Typography>
                 <Table size="small" aria-label="purchases">
-                  {/* <TableHead>
-                    <TableRow>
-                      <TableCell>{name}</TableCell>
-                    </TableRow>
-                  </TableHead> */}
                   <TableBody>
                     <TableRow key={name}>
-                      <TableCell
-                        style={{
-                          color: cmpd >= 0.05 ? '#43a047' : cmpd <= -0.05 ? '#e53935' : '#fb8c00'
-                        }}
-                      >
+                      <TableCell>
                         {comment}
                       </TableCell>
                     </TableRow>
@@ -298,36 +363,76 @@ const Analyzer = () => {
         <Container maxWidth={false}>
           <Box sx={{ mt: 3 }}>
             <Card>
-              <CardContent style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <Box style={{ width: '85%' }}>
-                  <TextField
-                    fullWidth
-                    placeholder="Paste URL"
-                    variant="outlined"
-                    onChange={(e) => setPostUrl(e.target.value)}
-                    value={postUrl}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') {
-                        handleAnalyze();
-                      }
-                    }}
-                  />
-                </Box>
-                <Box style={{ width: '13.5%' }}>
-                  <Button
-                    color="primary"
-                    variant="contained"
-                    onClick={handleAnalyze}
-                    style={{
-                      width: '100%',
-                      height: '100%',
-                      fontSize: '20px',
-                      fontFamily: 'Roboto'
-                    }}
-                  >
-                    Analyze
-                  </Button>
-                </Box>
+              <CardContent
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  padding: '16px'
+                }}
+              >
+                <Grid container spacing={2}>
+                  <Grid item xs={10}>
+                    <Box>
+                      <TextField
+                        fullWidth
+                        placeholder="Paste URL"
+                        variant="outlined"
+                        onChange={(e) => {
+                          setNotFbPage(false);
+                          setPostUrl(e.target.value);
+                        }}
+                        value={postUrl}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            checkURL();
+                          }
+                        }}
+                      />
+                    </Box>
+                  </Grid>
+
+                  <Grid item xs={2}>
+                    <Box style={{ height: '100%' }}>
+                      <Button
+                        color="primary"
+                        variant="contained"
+                        onClick={checkURL}
+                        style={{
+                          width: '100%',
+                          height: '100%',
+                          fontSize: '20px',
+                          fontFamily: 'Roboto'
+                        }}
+                      >
+                        Analyze
+                      </Button>
+                    </Box>
+                  </Grid>
+
+                  <Grid item xs={12}>
+                    <RadioGroup
+                      aria-label="gender"
+                      name="gender1"
+                      value={radioValue}
+                      onChange={(e) => setRadioValue(e.target.value)}
+                      style={{
+                        flexDirection: 'row',
+                        justifyContent: 'center'
+                      }}
+                    >
+                      <FormControlLabel
+                        value="database"
+                        control={<Radio />}
+                        label="First check database if the result is stored (reanalyze if not stored)"
+                      />
+                      <FormControlLabel
+                        value="reanalyze"
+                        control={<Radio />}
+                        label="Reanalyze the post without checking database"
+                      />
+                    </RadioGroup>
+                  </Grid>
+                </Grid>
               </CardContent>
             </Card>
           </Box>
@@ -358,7 +463,39 @@ const Analyzer = () => {
           </div>
         </div>
 
-        <Container maxWidth={false} style={{ display: !loading && analyze && !error ? 'block' : 'none' }}>
+        <Typography
+          style={{
+            display: !loading && !analyze && error.length ? 'block' : 'none',
+            textAlign: 'center',
+            marginTop: '40px'
+          }}
+        >
+          {error}
+        </Typography>
+
+        <Typography
+          style={{
+            display: notFbPage ? 'block' : 'none',
+            textAlign: 'center',
+            marginTop: '40px'
+          }}
+        >
+          Provided URL is not of facebook post
+        </Typography>
+
+        {/* <Typography
+          style={{
+            display: (!loading && error.length) ? 'block' : 'none',
+            textAlign: 'center',
+            marginTop: '40px'
+          }}
+        >
+          Error:
+          {' '}
+          {error}
+        </Typography> */}
+
+        <Container maxWidth={false} style={{ display: !loading && analyze && !error.length ? 'block' : 'none' }}>
           <Box marginY="30px">
             <Grid
               container
@@ -404,77 +541,47 @@ const Analyzer = () => {
                       <Typography color="primary" variant="h3">Comments</Typography>
                     </CardContent>
 
-                    <PerfectScrollbar>
-                      <Box>
-                        <Paper className={classes.root}>
-                          <TableContainer className={classes.container}>
-                            <Table stickyHeader aria-label="sticky table">
-                              <TableHead>
-                                <TableRow>
-                                  <TableCell />
-                                  <TableCell>Name</TableCell>
-                                  <TableCell>Positive</TableCell>
-                                  <TableCell>Neutral</TableCell>
-                                  <TableCell>Negative</TableCell>
-                                </TableRow>
-                              </TableHead>
-                              <TableBody>
-                                {comments.length
-                                  ? comments.map((comment) => (
-                                    <Row
-                                      key={comment.name}
-                                      name={comment.name}
-                                      positivePercentage={(comment.object.pos * 100).toFixed(1)}
-                                      neutralPercentage={(comment.object.neu * 100).toFixed(1)}
-                                      negativePercentage={(comment.object.neg * 100).toFixed(1)}
-                                      cmpd={comment.object.compound}
-                                      comment={comment.object.val}
-                                    />
-                                  ))
-                                  : (
-                                    <TableRow>
-                                      <TableCell />
-                                      <TableCell>Something is wrong with URL.</TableCell>
-                                    </TableRow>
-                                  )}
-                              </TableBody>
-                            </Table>
-                          </TableContainer>
-                        </Paper>
-                      </Box>
-                    </PerfectScrollbar>
-                    {/* <div
-                        key={comment.name}
-                        className="name"
-                        role="button"
-                        tabIndex={index}
-                      >
-                        <Divider />
-                        <Typography color="textPrimary" variant="h5" marginTop="10px">{comment.name}</Typography>
-                      </div> */}
+                    <Box>
+                      <Paper className={classes.root}>
+                        <TableContainer className={classes.container}>
+                          <Table stickyHeader aria-label="sticky table">
+                            <TableHead>
+                              <TableRow>
+                                <TableCell />
+                                <TableCell>Name</TableCell>
+                                <TableCell>Positive</TableCell>
+                                <TableCell>Neutral</TableCell>
+                                <TableCell>Negative</TableCell>
+                              </TableRow>
+                            </TableHead>
+                            <TableBody>
+                              {comments.length
+                                ? comments.map((comment) => (
+                                  <Row
+                                    key={comment.name}
+                                    name={comment.name}
+                                    positivePercentage={(comment.object.pos * 100).toFixed(1)}
+                                    neutralPercentage={(comment.object.neu * 100).toFixed(1)}
+                                    negativePercentage={(comment.object.neg * 100).toFixed(1)}
+                                    compound={comment.object.compound}
+                                    comment={comment.object.val}
+                                  />
+                                ))
+                                : (
+                                  <TableRow>
+                                    <TableCell />
+                                    <TableCell>Something is wrong with URL.</TableCell>
+                                  </TableRow>
+                                )}
+                            </TableBody>
+                          </Table>
+                        </TableContainer>
+                      </Paper>
+                    </Box>
                   </Card>
                 </Box>
-                <Box
-                  sx={{
-                    display: 'flex',
-                    justifyContent: 'center',
-                    pt: 3
-                  }}
-                >
-                  {/* <Pagination
-                    color="primary"
-                    count={3}
-                    size="small"
-                  /> */}
-                </Box>
               </Grid>
-              <Grid
-                item
-                xl={3}
-                lg={4}
-                md={6}
-                xs={12}
-              >
+              <Grid item xl={3} lg={4} md={6} xs={12}>
                 <TrafficByDevice
                   positive={positive}
                   neutral={neutral}
@@ -483,48 +590,7 @@ const Analyzer = () => {
               </Grid>
             </Grid>
           </Box>
-          {/* <Box sx={{ pt: 3 }}>
-          <Grid
-            container
-            spacing={3}
-          >
-            {products.map((product) => (
-              <Grid
-                item
-                key={product.id}
-                lg={4}
-                md={6}
-                xs={12}
-              >
-                <ProductCard product={product} />
-              </Grid>
-            ))}
-          </Grid>
-        </Box>
-        <Box
-          sx={{
-            display: 'flex',
-            justifyContent: 'center',
-            pt: 3
-          }}
-        >
-          <Pagination
-            color="primary"
-            count={3}
-            size="small"
-          />
-        </Box> */}
         </Container>
-
-        <div
-          style={{
-            display: (!loading && error) ? 'block' : 'none',
-            textAlign: 'center',
-            marginTop: '40px'
-          }}
-        >
-          URL is not correct OR post doesn&#39t have any comment
-        </div>
       </Box>
     </>
   );

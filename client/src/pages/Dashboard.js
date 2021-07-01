@@ -13,9 +13,9 @@ import './dashboard.css';
 const Dashboard = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
-  const [positive, setPositive] = useState(0.333);
-  const [neutral, setNeutral] = useState(0.333);
-  const [negative, setNegative] = useState(0.333);
+  const [positive, setPositive] = useState(0);
+  const [neutral, setNeutral] = useState(0);
+  const [negative, setNegative] = useState(0);
   // eslint-disable-next-line no-unused-vars
   const [compound, setCompound] = useState(0);
 
@@ -28,6 +28,7 @@ const Dashboard = () => {
         'x-access-token': localStorage.getItem('token')
       },
       params: {
+        userId: localStorage.getItem('userId'),
         loginWithFB: localStorage.getItem('loginWithFB')
       }
     })
@@ -72,6 +73,7 @@ const Dashboard = () => {
       },
       params: {
         id: url,
+        userId: localStorage.getItem('userId'),
         loginWithFB: localStorage.getItem('loginWithFB')
       }
     })
@@ -148,13 +150,13 @@ const Dashboard = () => {
 
         <Container maxWidth={false} style={{ display: !loading ? 'block' : 'none' }}>
           <Grid container spacing={4}>
-            <Grid item xl={3} lg={4} sm={6} xs={12}>
+            <Grid item xl={4} lg={4} sm={6} xs={12}>
               <Positive percentage={positive} />
             </Grid>
-            <Grid item xl={3} lg={4} sm={6} xs={12}>
+            <Grid item xl={4} lg={4} sm={6} xs={12}>
               <Neutral percentage={neutral} />
             </Grid>
-            <Grid item xl={3} lg={4} sm={6} xs={12}>
+            <Grid item xl={4} lg={4} sm={6} xs={12}>
               <Negative percentage={negative} />
             </Grid>
             <Grid item lx={9} lg={8} md={12} xs={12}>

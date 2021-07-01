@@ -9,12 +9,13 @@ const Post = require("../../models/Post");
 // @access public
 router.post("/save", (req, res) => {
     if (req.body.loginWithFB) {
-        Post.findOne({ id: req.body.id }).then((post) => {
+        Post.findOne({ id: req.body.id, userId: req.body.userId }).then((post) => {
             if (post) {
                 return res.status(400).json({ message: "Post already exists" });
             } else {
                 const newPost = new Post({
                     id: req.body.id,
+                    userId: req.body.userId,
                     comments: req.body.comments,
                 });
                 newPost
@@ -34,12 +35,13 @@ router.post("/save", (req, res) => {
             if (err) {
                 return res.status(401).json({ message: "Unauthorized!" });
             }
-            Post.findOne({ id: req.body.id }).then((post) => {
+            Post.findOne({ id: req.body.id, userId: req.body.userId }).then((post) => {
                 if (post) {
                     return res.status(400).json({ message: "Post already exists" });
                 } else {
                     const newPost = new Post({
                         id: req.body.id,
+                        userId: req.body.userId,
                         comments: req.body.comments,
                     });
                     newPost
@@ -57,8 +59,9 @@ router.post("/save", (req, res) => {
 // @access public
 router.get("/find", (req, res) => {
     if (req.query.loginWithFB === "true") {
-        const id = (req.query.id).replace('loginWithFB=true','\b');
-        Post.findOne({ id }).then((post) => {
+        const id = (req.query.id).replace('loginWithFB=true', '\b');
+        const userId = req.query.userId;
+        Post.findOne({ id, userId }).then((post) => {
             if (post) {
                 return res.status(200).json({ ...post._doc });
             } else {
@@ -66,8 +69,8 @@ router.get("/find", (req, res) => {
             }
         });
     } else {
-        const id = (req.query.id).replace('loginWithFB=false','\b');
-        console.log(id);
+        const id = (req.query.id).replace('loginWithFB=false', '\b');
+        const userId = req.query.userId;
         let token = req.headers["x-access-token"];
 
         if (!token) {
@@ -78,7 +81,7 @@ router.get("/find", (req, res) => {
             if (err) {
                 return res.status(401).json({ message: "Unauthorized!" });
             } else {
-                Post.findOne({ id }).then((post) => {
+                Post.findOne({ id, userId }).then((post) => {
                     if (post) {
                         return res.status(200).json({ ...post._doc });
                     } else {
@@ -90,12 +93,24 @@ router.get("/find", (req, res) => {
     }
 });
 
+// router.get('/find-from-extension', (req, res) => {
+//     if (req.query.id) {
+//         Post.findOne({ id: req.query.id }).then((post) => {
+//             if (post) {
+//                 return res.status(200).json({ ...post._doc });
+//             } else {
+//                 return res.status(404).json({ message: "Post not found" });
+//             }
+//         });
+//     }
+// });
+
 // @route GET api/posts/findlatest
 // @desc Find latest post
 // @access public
 router.get("/findlatest", (req, res) => {
     if (req.query.loginWithFB === "true") {
-        Post.findOne()
+        Post.findOne({ userId: req.query.userId })
             .sort({ _id: -1 })
             .limit(1)
             .then((post) => {
@@ -116,7 +131,7 @@ router.get("/findlatest", (req, res) => {
             if (err) {
                 return res.status(401).json({ message: "Unauthorized!" });
             } else {
-                Post.findOne()
+                Post.findOne({ userId: req.query.userId })
                     .sort({ _id: -1 })
                     .limit(1)
                     .then((post) => {
@@ -136,7 +151,7 @@ router.get("/findlatest", (req, res) => {
 // @access public
 router.get("/", (req, res) => {
     if (req.query.loginWithFB === "true") {
-        Post.find({}, (err, posts) => {
+        Post.find({ userId: req.query.userId }, (err, posts) => {
             var postMap = {};
 
             posts.forEach((post) => {
@@ -158,7 +173,7 @@ router.get("/", (req, res) => {
             if (err) {
                 return res.status(401).json({ message: "Unauthorized!" });
             } else {
-                Post.find({}, (err, posts) => {
+                Post.find({ userId: req.query.userId }, (err, posts) => {
                     var postMap = {};
 
                     posts.forEach((post) => {
