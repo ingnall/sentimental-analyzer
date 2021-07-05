@@ -1,30 +1,26 @@
-import { useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
-// import { Link as RouterLink, useLocation } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import axios from 'axios';
+// import { useLocation } from 'react-router-dom';
+import { Link as RouterLink, useLocation, useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import {
-  // Avatar,
+  Avatar,
   Box,
-  // Divider,
+  Divider,
   Drawer,
   Hidden,
   List,
-  // Typography
+  Typography
 } from '@material-ui/core';
 import {
   BarChart as BarChartIcon,
   Settings as SettingsIcon,
   ShoppingBag as ShoppingBagIcon,
   User as UserIcon,
-  Users as UsersIcon
+  Users as UsersIcon,
+  LogOut
 } from 'react-feather';
 import NavItem from './NavItem';
-
-// const user = {
-//   avatar: '/static/images/avatars/avatar_6.png',
-//   jobTitle: 'Student',
-//   name: 'Faizan Khalid'
-// };
 
 const items = [
   {
@@ -52,20 +48,36 @@ const items = [
     icon: SettingsIcon,
     title: 'Setting'
   }
-  // {
-  //   href: '/login',
-  //   icon: SettingsIcon,
-  //   title: 'Login'
-  // }
 ];
 
 const DashboardSidebar = ({ onMobileClose, openMobile }) => {
+  const navigate = useNavigate();
   const location = useLocation();
+  const avatar = '/static/images/avatars/user.png';
+  const [name, setName] = useState('');
 
   useEffect(() => {
     if (openMobile && onMobileClose) {
       onMobileClose();
     }
+    axios.get('http://localhost:5000/api/user/find', {
+      headers: {
+        'Access-Control-Allow-Origin': true,
+        'x-access-token': localStorage.getItem('token')
+      },
+      params: {
+        userId: localStorage.getItem('userId'),
+        loginWithFB: localStorage.getItem('loginWithFB')
+      }
+    }).then((res) => {
+      console.log(res.data);
+      setName(`${res.data.firstName} ${res.data.lastName}`);
+    }).catch((err) => {
+      if (err.response.status === 400 || err.response.status === 401 || err.response.status === 403) {
+        console.log(err.response.message);
+        navigate('/login', { replace: true });
+      }
+    });
   }, [location.pathname]);
 
   const content = (
@@ -76,7 +88,7 @@ const DashboardSidebar = ({ onMobileClose, openMobile }) => {
         height: '100%'
       }}
     >
-      {/* <Box
+      <Box
         sx={{
           alignItems: 'center',
           display: 'flex',
@@ -86,7 +98,7 @@ const DashboardSidebar = ({ onMobileClose, openMobile }) => {
       >
         <Avatar
           component={RouterLink}
-          src={user.avatar}
+          src={avatar}
           sx={{
             cursor: 'pointer',
             width: 64,
@@ -97,17 +109,18 @@ const DashboardSidebar = ({ onMobileClose, openMobile }) => {
         <Typography
           color="textPrimary"
           variant="h5"
+          style={{ paddingTop: '5px' }}
         >
-          {user.name}
+          {name}
         </Typography>
-        <Typography
+        {/* <Typography
           color="textSecondary"
           variant="body2"
         >
-          {user.jobTitle}
-        </Typography>
+          {jobTitle}
+        </Typography> */}
       </Box>
-      <Divider /> */}
+      <Divider />
       <Box sx={{ p: 2 }}>
         <List>
           {items.map((item) => (
@@ -118,6 +131,16 @@ const DashboardSidebar = ({ onMobileClose, openMobile }) => {
               icon={item.icon}
             />
           ))}
+          <NavItem
+            href="/login"
+            title="Logout"
+            icon={LogOut}
+            onClick={() => {
+              localStorage.removeItem('userId');
+              localStorage.removeItem('token');
+              localStorage.removeItem('loginWithFB');
+            }}
+          />
         </List>
       </Box>
       <Box sx={{ flexGrow: 1 }} />

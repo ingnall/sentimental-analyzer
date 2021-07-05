@@ -552,6 +552,7 @@ const Analyzer = () => {
                                 <TableCell>Positive</TableCell>
                                 <TableCell>Neutral</TableCell>
                                 <TableCell>Negative</TableCell>
+                                <TableCell>Compound</TableCell>
                               </TableRow>
                             </TableHead>
                             <TableBody>

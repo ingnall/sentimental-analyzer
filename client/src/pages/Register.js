@@ -82,7 +82,7 @@ const Register = () => {
             onSubmit={(e) => {
               console.log(e);
               axios
-                .post('http://localhost:5000/api/users/register', {
+                .post('http://localhost:5000/api/user/register', {
                   firstName: e.firstName,
                   lastName: e.lastName,
                   email: e.email,

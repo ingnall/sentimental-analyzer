@@ -9,9 +9,8 @@ import {
   IconButton,
   Toolbar
 } from '@material-ui/core';
+import { LogOut } from 'react-feather';
 import MenuIcon from '@material-ui/icons/Menu';
-// import NotificationsIcon from '@material-ui/icons/NotificationsOutlined';
-import InputIcon from '@material-ui/icons/Input';
 import Logo from './Logo';
 
 const DashboardNavbar = ({ onMobileNavOpen, ...rest }) => {
@@ -47,7 +46,7 @@ const DashboardNavbar = ({ onMobileNavOpen, ...rest }) => {
               navigate('/login', { replace: true });
             }}
           >
-            <InputIcon />
+            <LogOut />
           </IconButton>
         </Hidden>
         <Hidden lgUp>

@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 import { useState, useEffect } from 'react';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
@@ -24,6 +25,7 @@ const Login = () => {
     axios.get('http://localhost:5000/api/user/find', {
       headers: {
         'Access-Control-Allow-Origin': true,
+        'Access-Control-Allow-Credentials': true,
         'x-access-token': localStorage.getItem('token')
       },
       params: {
@@ -36,8 +38,6 @@ const Login = () => {
     }).catch((err) => { console.log(err); console.log('User not logged in'); });
   }, []);
 
-  const componentClicked = () => { };
-
   const responseFacebook = (fbRes) => {
     console.log(fbRes);
     // eslint-disable-next-line no-undef
@@ -45,20 +45,24 @@ const Login = () => {
       if (response.status === 'connected') {
         console.log(response);
 
-        axios.post('http://localhost:5000/api/users/facebook-login', {
+        axios.post('http://localhost:5000/api/user/facebook-login', {
           firstName: fbRes.name.split(' ')[0],
           lastName: fbRes.name.split(' ')[1],
           email: fbRes.email,
         }, {
           headers: {
             'Access-Control-Allow-Origin': true,
+            'Access-Control-Allow-Credentials': true,
           }
         })
           .then((res) => {
             console.log(res.data);
-            localStorage.setItem('userId', res.data.userId);
-            localStorage.setItem('loginWithFB', true);
-            localStorage.setItem('token', fbRes.accessToken);
+            chrome.storage.local.set({ userId: res.data.userId });
+            chrome.storage.local.set({ loginWithFB: true });
+            chrome.storage.local.set({ token: fbRes.accessToken });
+            // localStorage.setItem('userId', res.data.userId);
+            // localStorage.setItem('loginWithFB', true);
+            // localStorage.setItem('token', fbRes.accessToken);
             navigate('/app/dashboard', { replace: true });
           })
           .catch((err) => { console.log(err); });
@@ -91,7 +95,7 @@ const Login = () => {
               password: Yup.string().max(255).required('Password is required')
             })}
             onSubmit={(e) => {
-              axios.post('http://localhost:5000/api/users/login', {
+              axios.post('http://localhost:5000/api/user/login', {
                 email: e.email,
                 password: e.password
               }, {
@@ -154,7 +158,6 @@ const Login = () => {
                       fields="name,email,picture"
                       icon={<FacebookIcon style={{ marginBottom: '-6px', width: '25px' }} />}
                       size="small"
-                      onClick={componentClicked}
                       callback={responseFacebook}
                     />
                   </Grid>
