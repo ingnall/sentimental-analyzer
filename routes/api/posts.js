@@ -93,22 +93,11 @@ router.get("/find", (req, res) => {
     }
 });
 
-// router.get('/find-from-extension', (req, res) => {
-//     if (req.query.id) {
-//         Post.findOne({ id: req.query.id }).then((post) => {
-//             if (post) {
-//                 return res.status(200).json({ ...post._doc });
-//             } else {
-//                 return res.status(404).json({ message: "Post not found" });
-//             }
-//         });
-//     }
-// });
-
 // @route GET api/posts/findlatest
 // @desc Find latest post
 // @access public
 router.get("/findlatest", (req, res) => {
+    console.log("Cookies: ", req.cookies);
     if (req.query.loginWithFB === "true") {
         Post.findOne({ userId: req.query.userId })
             .sort({ _id: -1 })

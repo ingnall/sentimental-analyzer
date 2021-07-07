@@ -57,12 +57,9 @@ const Login = () => {
         })
           .then((res) => {
             console.log(res.data);
-            chrome.storage.local.set({ userId: res.data.userId });
-            chrome.storage.local.set({ loginWithFB: true });
-            chrome.storage.local.set({ token: fbRes.accessToken });
-            // localStorage.setItem('userId', res.data.userId);
-            // localStorage.setItem('loginWithFB', true);
-            // localStorage.setItem('token', fbRes.accessToken);
+            localStorage.setItem('userId', res.data.userId);
+            localStorage.setItem('loginWithFB', true);
+            localStorage.setItem('token', fbRes.accessToken);
             navigate('/app/dashboard', { replace: true });
           })
           .catch((err) => { console.log(err); });

@@ -483,18 +483,6 @@ const Analyzer = () => {
           Provided URL is not of facebook post
         </Typography>
 
-        {/* <Typography
-          style={{
-            display: (!loading && error.length) ? 'block' : 'none',
-            textAlign: 'center',
-            marginTop: '40px'
-          }}
-        >
-          Error:
-          {' '}
-          {error}
-        </Typography> */}
-
         <Container maxWidth={false} style={{ display: !loading && analyze && !error.length ? 'block' : 'none' }}>
           <Box marginY="30px">
             <Grid
