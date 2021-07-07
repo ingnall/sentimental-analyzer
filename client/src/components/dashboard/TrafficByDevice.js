@@ -9,9 +9,7 @@ import {
   colors,
   useTheme
 } from '@material-ui/core';
-import SentimentSatisfiedAlt from '@material-ui/icons/SentimentSatisfiedAlt';
-import SentimentNeutral from '@material-ui/icons/SentimentNeutral';
-import SentimentVeryDissatisfied from '@material-ui/icons/SentimentVeryDissatisfied';
+import { SentimentSatisfiedAlt, SentimentNeutral, SentimentVeryDissatisfied } from '@material-ui/icons';
 
 const TrafficByDevice = (props) => {
   const { positive, neutral, negative } = { ...props };

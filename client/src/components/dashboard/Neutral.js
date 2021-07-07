@@ -8,7 +8,7 @@ import {
   Typography
 } from '@material-ui/core';
 import { orange } from '@material-ui/core/colors';
-import SentimentNeutral from '@material-ui/icons/SentimentNeutral';
+import { SentimentNeutral } from '@material-ui/icons';
 import { toNumber } from 'lodash';
 
 const Neutral = (props) => {

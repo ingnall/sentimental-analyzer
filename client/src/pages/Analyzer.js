@@ -4,7 +4,6 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import {
-  makeStyles,
   Box,
   Container,
   Collapse,
@@ -26,6 +25,7 @@ import {
   TableRow,
   TableCell
 } from '@material-ui/core';
+import { makeStyles } from '@material-ui/styles';
 import { KeyboardArrowUp, KeyboardArrowDown } from '@material-ui/icons';
 import Negative from '../components/dashboard/Negative';
 import Positive from '../components/dashboard/Positive';
