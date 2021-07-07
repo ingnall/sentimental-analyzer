@@ -17,8 +17,6 @@
 # misc
 .DS_Store
 /client/.DS_Store
-/.env
-/client/.env
 /.env.local
 /client/.env.local
 /.env.development.local

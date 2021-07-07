@@ -43,7 +43,11 @@ const SettingsPassword = (props) => {
           'x-access-token': localStorage.getItem('token')
         }
       })
-        .then((res) => console.log('success: ', res.data))
+        .then((res) => {
+          console.log('success: ', res.data);
+          // eslint-disable-next-line no-alert
+          alert('Password updated.');
+        })
         .catch((err) => console.log(err));
     }
   };

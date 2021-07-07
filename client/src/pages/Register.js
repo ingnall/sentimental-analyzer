@@ -7,9 +7,7 @@ import { Formik } from 'formik';
 import {
   Box,
   Button,
-  // Checkbox,
   Container,
-  // FormHelperText,
   Link,
   TextField,
   Typography
@@ -70,14 +68,13 @@ const Register = () => {
                 .required('Last name is required'),
               password: Yup.string()
                 .max(255)
+                .min(8)
                 .required('password is required'),
               password2: Yup.string()
                 .max(255)
+                .min(8)
                 .required('password is required')
-              // policy: Yup.boolean().oneOf(
-              //   [true],
-              //   'This field must be checked'
-              // )
+                .length(8)
             })}
             onSubmit={(e) => {
               console.log(e);
@@ -190,6 +187,7 @@ const Register = () => {
                   value={values.password2}
                   variant="outlined"
                 />
+                {/* <Typography color="red" size="large" textAlign="center" display={wrong ? 'block' : 'none'}>Email or password is wrong</Typography> */}
                 <Box sx={{ py: 2 }}>
                   <Button
                     color="primary"

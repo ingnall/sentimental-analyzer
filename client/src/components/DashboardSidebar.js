@@ -1,16 +1,17 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
+// import { useState, useEffect } from 'react';
 import axios from 'axios';
-// import { useLocation } from 'react-router-dom';
-import { Link as RouterLink, useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
+// import { Link as RouterLink, useLocation, useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import {
-  Avatar,
+  // Avatar,
   Box,
-  Divider,
+  // Divider,
   Drawer,
   Hidden,
   List,
-  Typography
+  // Typography
 } from '@material-ui/core';
 import {
   BarChart as BarChartIcon,
@@ -53,8 +54,8 @@ const items = [
 const DashboardSidebar = ({ onMobileClose, openMobile }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const avatar = '/static/images/avatars/user.png';
-  const [name, setName] = useState('');
+  // const avatar = '/static/images/avatars/user.png';
+  // const [name, setName] = useState('');
 
   useEffect(() => {
     if (openMobile && onMobileClose) {
@@ -71,7 +72,7 @@ const DashboardSidebar = ({ onMobileClose, openMobile }) => {
       }
     }).then((res) => {
       console.log(res.data);
-      setName(`${res.data.firstName} ${res.data.lastName}`);
+      // setName(`${res.data.firstName} ${res.data.lastName}`);
     }).catch((err) => {
       if (err.response.status === 400 || err.response.status === 401 || err.response.status === 403) {
         console.log(err.response.message);
@@ -88,7 +89,7 @@ const DashboardSidebar = ({ onMobileClose, openMobile }) => {
         height: '100%'
       }}
     >
-      <Box
+      {/* <Box
         sx={{
           alignItems: 'center',
           display: 'flex',
@@ -113,14 +114,14 @@ const DashboardSidebar = ({ onMobileClose, openMobile }) => {
         >
           {name}
         </Typography>
-        {/* <Typography
+        <Typography
           color="textSecondary"
           variant="body2"
         >
           {jobTitle}
-        </Typography> */}
+        </Typography>
       </Box>
-      <Divider />
+      <Divider /> */}
       <Box sx={{ p: 2 }}>
         <List>
           {items.map((item) => (

@@ -13,24 +13,24 @@ import {
 } from '@material-ui/core';
 
 // eslint-disable-next-line no-unused-vars
-const states = [
-  {
-    value: 'Punjab',
-    label: 'Punjab'
-  },
-  {
-    value: 'Sindh',
-    label: 'Sindh'
-  },
-  {
-    value: 'Balochistan',
-    label: 'Balochistan'
-  },
-  {
-    value: 'KPK',
-    label: 'KPK'
-  }
-];
+// const states = [
+//   {
+//     value: 'Punjab',
+//     label: 'Punjab'
+//   },
+//   {
+//     value: 'Sindh',
+//     label: 'Sindh'
+//   },
+//   {
+//     value: 'Balochistan',
+//     label: 'Balochistan'
+//   },
+//   {
+//     value: 'KPK',
+//     label: 'KPK'
+//   }
+// ];
 
 const AccountProfileDetails = (props) => {
   const navigate = useNavigate();
@@ -88,6 +88,8 @@ const AccountProfileDetails = (props) => {
       }
     }).then((res) => {
       console.log(res.data);
+      // eslint-disable-next-line no-alert
+      alert('Account updated.');
     }).catch((err) => {
       console.log(err);
     });
