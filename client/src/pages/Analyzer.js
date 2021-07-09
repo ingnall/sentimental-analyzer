@@ -544,17 +544,22 @@ const Analyzer = () => {
                             </TableHead>
                             <TableBody>
                               {comments.length
-                                ? comments.map((comment) => (
-                                  <Row
-                                    key={comment.name}
-                                    name={comment.name}
-                                    positivePercentage={(comment.object.pos * 100).toFixed(1)}
-                                    neutralPercentage={(comment.object.neu * 100).toFixed(1)}
-                                    negativePercentage={(comment.object.neg * 100).toFixed(1)}
-                                    compound={comment.object.compound}
-                                    comment={comment.object.val}
-                                  />
-                                ))
+                                ? comments.map((comment) => {
+                                  if (!(comment.object.pos === comment.object.neu === comment.object.neg === 0.0)) {
+                                    return (
+                                      <Row
+                                        key={comment.name}
+                                        name={comment.name}
+                                        positivePercentage={(comment.object.pos * 100).toFixed(1)}
+                                        neutralPercentage={(comment.object.neu * 100).toFixed(1)}
+                                        negativePercentage={(comment.object.neg * 100).toFixed(1)}
+                                        compound={comment.object.compound}
+                                        comment={comment.object.val}
+                                      />
+                                    );
+                                  }
+                                  return (<></>);
+                                })
                                 : (
                                   <TableRow>
                                     <TableCell />
