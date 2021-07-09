@@ -545,7 +545,7 @@ const Analyzer = () => {
                             <TableBody>
                               {comments.length
                                 ? comments.map((comment) => {
-                                  if (!(comment.object.pos === comment.object.neu === comment.object.neg === 0.0)) {
+                                  if (comment.object.pos !== 0.0 && comment.object.neu !== 0.0 && comment.object.neg !== 0.0) {
                                     return (
                                       <Row
                                         key={comment.name}
